@@ -33,7 +33,23 @@ app.get('/api/auteurs/:auteurId/livres', async (req,res) => {
         res.json({message: "Erreur serveur"})
     }
 })
-
+app.put('/api/livres/:id', async (req, res)=> {
+    const livreId = parseInt(req.params.id);
+    try {
+        const [nbLigneAffectees] = await db.Livre.update(req.body, {
+            where: {id: livreId}
+        });
+        if (nbLigneAffectees === 0) {
+            res.json({message: "Livre non trouvé ou aucune modification apporté."})
+        }
+        const  livreUpdated = await db.Livre.findByPk(livreId, {
+            include:[{model:db.Auteur, as: 'auteur'}]
+        })
+        res.json({livreUpdated})
+    } catch (error) {
+        res.json({message: "Erreur lors de la mise à jou:." + error})
+    }
+})
 
 app.listen(port, () => {
     console.log(`Serveur app demarré sur le port ${port}`);
