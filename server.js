@@ -1,6 +1,6 @@
 const express = require('express');
 const app = express();
-const db = require('./models')
+const db = require('./models');
 
 const port = 5678
 
@@ -50,7 +50,20 @@ app.put('/api/livres/:id', async (req, res)=> {
         res.json({message: "Erreur lors de la mise à jou:." + error})
     }
 })
-
+app.delete('/api/livres/id', async (req, res) => {
+    const livreId = parseInt(req.params.id)
+    try {
+        const nbLignesSupprimees = await db.Livre.destroy({
+            where:{id:livreId}
+        })
+        if(nbLignesSupprimees === 0){
+            return res.json({message: "Livre non trouvé"})
+        }
+        res.status(204).json()
+    } catch (error) {
+        res.json({message:"Erreur lors de la suppression:" + error})
+    }
+})
 app.listen(port, () => {
     console.log(`Serveur app demarré sur le port ${port}`);
     
